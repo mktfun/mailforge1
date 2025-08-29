@@ -163,7 +163,15 @@ function generateHtml(blocks: Block[]) {
         );
       } else if (b.type === "columns") {
         const count = b.props.columnCount;
-        const widths = count === 2 ? [50, 50] : [33, 34, 33];
+        const layout = b.props.layout || "equal";
+        let widths: number[];
+
+        if (count === 2) {
+          widths = layout === "70-30" ? [70, 30] : layout === "30-70" ? [30, 70] : [50, 50];
+        } else {
+          widths = [33, 34, 33];
+        }
+
         parts.push(
           `<tr><td style=\"padding:12px 0;\"><table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\"><tr>`,
         );
@@ -180,6 +188,27 @@ function generateHtml(blocks: Block[]) {
           parts.push("</td>");
         });
         parts.push(`</tr></table></td></tr>`);
+      } else if (b.type === "box") {
+        const bg = b.props.backgroundColor || "transparent";
+        const padding = b.props.padding || 0;
+        const margin = b.props.margin || 0;
+        const border = b.props.border || "none";
+        const borderRadius = b.props.borderRadius || 0;
+
+        parts.push(
+          `<tr><td style=\"padding:${margin}px 0;\"><table role=\"presentation\" width=\"100%\" cellspacing=\"0\" cellpadding=\"0\" style=\"background:${bg}; border:${border}; border-radius:${borderRadius}px;\"><tr><td style=\"padding:${padding}px;\">`,
+        );
+        parts.push(
+          '<table role="presentation" width="100%" cellspacing="0" cellpadding="0">',
+        );
+        renderBlocks(b.props.blocks);
+        parts.push("</table>");
+        parts.push("</td></tr></table></td></tr>");
+      } else if (b.type === "spacer") {
+        const height = b.props.height || 32;
+        parts.push(
+          `<tr><td style=\"height:${height}px; line-height:${height}px; font-size:1px;\">&nbsp;</td></tr>`,
+        );
       }
     }
   }
