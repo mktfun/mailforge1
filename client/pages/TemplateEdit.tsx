@@ -1067,12 +1067,21 @@ function RenderBlock({
   }
   if (block.type === "columns") {
     const count = block.props.columnCount;
+    const layout = block.props.layout || "equal";
     const cols = block.props.columns.slice(0, count);
+
+    let gridTemplate: string;
+    if (count === 2) {
+      gridTemplate = layout === "70-30" ? "7fr 3fr" : layout === "30-70" ? "3fr 7fr" : "1fr 1fr";
+    } else {
+      gridTemplate = `repeat(${count}, minmax(0, 1fr))`;
+    }
+
     return (
       <div className="w-full">
         <div
           className="grid gap-3"
-          style={{ gridTemplateColumns: `repeat(${count}, minmax(0, 1fr))` }}
+          style={{ gridTemplateColumns: gridTemplate }}
         >
           {cols.map((col, ci) => (
             <div key={col.id} className="rounded border p-2">
