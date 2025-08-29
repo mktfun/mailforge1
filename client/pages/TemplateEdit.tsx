@@ -406,11 +406,13 @@ export default function TemplateEdit() {
       return { type: "divider", props: { color: b.props?.color ?? "#E2E8F0" } };
     if (b.type === "columns") {
       const count = b.props?.columnCount === 3 ? 3 : 2;
+      const layout = b.props?.layout || "equal";
       const cols = Array.isArray(b.props?.columns) ? b.props.columns : [];
       return {
         type: "columns",
         props: {
           columnCount: count,
+          layout: layout,
           columns: cols
             .slice(0, count)
             .map((c: any) => ({
@@ -423,6 +425,28 @@ export default function TemplateEdit() {
             })),
         },
       } as Block;
+    }
+    if (b.type === "box") {
+      const blocks = Array.isArray(b.props?.blocks) ? b.props.blocks : [];
+      return {
+        type: "box",
+        props: {
+          backgroundColor: b.props?.backgroundColor ?? "transparent",
+          padding: b.props?.padding ?? 16,
+          margin: b.props?.margin ?? 0,
+          border: b.props?.border ?? "1px solid #E2E8F0",
+          borderRadius: b.props?.borderRadius ?? 8,
+          blocks: blocks.map((bb: any) => normalizeBlock(bb)),
+        },
+      };
+    }
+    if (b.type === "spacer") {
+      return {
+        type: "spacer",
+        props: {
+          height: b.props?.height ?? 32,
+        },
+      };
     }
     return defaultBlock("text");
   }
