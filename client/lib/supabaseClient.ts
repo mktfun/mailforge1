@@ -18,5 +18,81 @@ export const supabase = createClient(supabaseUrl, supabaseAnon, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: true
-  }
+  },
+  global: {
+    fetch: (url, options = {}) => {
+      console.log('Supabase fetch:', url, options);
+      return fetch(url, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...options.headers,
+        },
+      });
+    },
+  },
 });
+
+// Simple local fallback for testing
+export const mockAuth = {
+  async signInWithPassword({ email, password }: { email: string; password: string }) {
+    console.log('Mock auth attempted with:', email, password);
+    // For testing purposes - accept any email/password
+    if (email && password) {
+      const mockUser = {
+        id: 'mock-user-id',
+        email,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      // Store in localStorage for persistence
+      localStorage.setItem('mock-user', JSON.stringify(mockUser));
+
+      return {
+        data: {
+          user: mockUser,
+          session: {
+            access_token: 'mock-token',
+            user: mockUser,
+          }
+        },
+        error: null
+      };
+    }
+
+    return {
+      data: { user: null, session: null },
+      error: { message: 'Invalid credentials' }
+    };
+  },
+
+  async signUp({ email, password }: { email: string; password: string }) {
+    return this.signInWithPassword({ email, password });
+  },
+
+  async getSession() {
+    const mockUser = localStorage.getItem('mock-user');
+    if (mockUser) {
+      const user = JSON.parse(mockUser);
+      return {
+        data: {
+          session: {
+            user,
+            access_token: 'mock-token'
+          }
+        },
+        error: null
+      };
+    }
+    return {
+      data: { session: null },
+      error: null
+    };
+  },
+
+  async signOut() {
+    localStorage.removeItem('mock-user');
+    return { error: null };
+  }
+};
