@@ -112,6 +112,7 @@ function defaultBlock(t: Block["type"]): Block {
         type: "columns",
         props: {
           columnCount: 2,
+          layout: "equal",
           columns: [
             { id: id1, blocks: [] },
             { id: id2, blocks: [] },
@@ -119,6 +120,23 @@ function defaultBlock(t: Block["type"]): Block {
         },
       } as Block;
     }
+    case "box":
+      return {
+        type: "box",
+        props: {
+          backgroundColor: "transparent",
+          padding: 16,
+          margin: 0,
+          border: "1px solid #E2E8F0",
+          borderRadius: 8,
+          blocks: [],
+        },
+      };
+    case "spacer":
+      return {
+        type: "spacer",
+        props: { height: 32 },
+      };
   }
 }
 
