@@ -88,6 +88,8 @@ const PALETTE: { key: Block["type"]; label: string }[] = [
   { key: "button", label: "Botão" },
   { key: "divider", label: "Divisor" },
   { key: "columns", label: "Colunas" },
+  { key: "box", label: "Caixa" },
+  { key: "spacer", label: "Espaçador" },
 ];
 
 function defaultBlock(t: Block["type"]): Block {
