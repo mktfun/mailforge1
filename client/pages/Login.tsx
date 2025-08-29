@@ -43,7 +43,11 @@ export default function Login() {
         console.log("Supabase login response:", result);
 
         // Check if Supabase returned an error but didn't throw
-        if (result.error && (result.error.message.includes("Failed to fetch") || result.error.message.includes("network"))) {
+        if (
+          result.error &&
+          (result.error.message.includes("Failed to fetch") ||
+            result.error.message.includes("network"))
+        ) {
           throw new Error(result.error.message);
         }
       } catch (supabaseError) {
@@ -76,7 +80,9 @@ export default function Login() {
 
         // Show a brief message if using fallback
         if (usingFallback) {
-          setError("Login realizado em modo offline (extensão do navegador interferindo na conexão)");
+          setError(
+            "Login realizado em modo offline (extensão do navegador interferindo na conexão)",
+          );
           setTimeout(() => setError(null), 3000);
         }
 
@@ -87,9 +93,15 @@ export default function Login() {
       console.error("Login catch error:", err);
       setLoading(false);
 
-      const errorMessage = err instanceof Error ? err.message : "Erro desconhecido";
-      if (errorMessage.includes("chrome-extension") || errorMessage.includes("Failed to fetch")) {
-        setError("Erro de rede detectado - possivelmente causado por extensão do navegador. Tente desabilitar extensões ou usar modo incógnito.");
+      const errorMessage =
+        err instanceof Error ? err.message : "Erro desconhecido";
+      if (
+        errorMessage.includes("chrome-extension") ||
+        errorMessage.includes("Failed to fetch")
+      ) {
+        setError(
+          "Erro de rede detectado - possivelmente causado por extensão do navegador. Tente desabilitar extensões ou usar modo incógnito.",
+        );
       } else {
         setError(`Erro de conexão: ${errorMessage}`);
       }

@@ -25,7 +25,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         if (!mounted) return;
 
-        if (error && (error.message.includes("Failed to fetch") || error.message.includes("network"))) {
+        if (
+          error &&
+          (error.message.includes("Failed to fetch") ||
+            error.message.includes("network"))
+        ) {
           throw new Error(error.message);
         }
 
@@ -84,7 +88,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           await mockAuth.signOut();
         }
         setUser(null);
-      }
+      },
     }),
     [user, loading],
   );

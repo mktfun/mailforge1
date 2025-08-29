@@ -54,7 +54,7 @@ export type Block =
       props: {
         columnCount: 2 | 3;
         layout?: "equal" | "70-30" | "30-70";
-        columns: { id: string; blocks: Block[] }[]
+        columns: { id: string; blocks: Block[] }[];
       };
     }
   | {
@@ -174,32 +174,36 @@ const PRESETS: { key: string; label: string; blocks: Block[] }[] = [
           columns: [
             {
               id: `header-logo-${Date.now()}`,
-              blocks: [{
-                type: "image",
-                props: {
-                  src: "https://placehold.co/120x60?text=LOGO",
-                  alt: "Logo",
-                  width: 120,
-                  height: 60
-                }
-              }]
+              blocks: [
+                {
+                  type: "image",
+                  props: {
+                    src: "https://placehold.co/120x60?text=LOGO",
+                    alt: "Logo",
+                    width: 120,
+                    height: 60,
+                  },
+                },
+              ],
             },
             {
               id: `header-menu-${Date.now()}`,
-              blocks: [{
-                type: "text",
-                props: {
-                  text: "Home | Sobre | Contato | Blog",
-                  fontSize: 16,
-                  color: "#2563EB",
-                  align: "right"
-                }
-              }]
-            }
-          ]
-        }
-      }
-    ]
+              blocks: [
+                {
+                  type: "text",
+                  props: {
+                    text: "Home | Sobre | Contato | Blog",
+                    fontSize: 16,
+                    color: "#2563EB",
+                    align: "right",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
   },
   {
     key: "footer",
@@ -213,45 +217,51 @@ const PRESETS: { key: string; label: string; blocks: Block[] }[] = [
           columns: [
             {
               id: `footer-contact-${Date.now()}`,
-              blocks: [{
-                type: "text",
-                props: {
-                  text: "Contato:\nEmail: contato@empresa.com\nTelefone: (11) 99999-9999",
-                  fontSize: 12,
-                  color: "#64748B",
-                  align: "left"
-                }
-              }]
+              blocks: [
+                {
+                  type: "text",
+                  props: {
+                    text: "Contato:\nEmail: contato@empresa.com\nTelefone: (11) 99999-9999",
+                    fontSize: 12,
+                    color: "#64748B",
+                    align: "left",
+                  },
+                },
+              ],
             },
             {
               id: `footer-social-${Date.now()}`,
-              blocks: [{
-                type: "text",
-                props: {
-                  text: "Redes Sociais:\nFacebook | Instagram | LinkedIn",
-                  fontSize: 12,
-                  color: "#2563EB",
-                  align: "center"
-                }
-              }]
+              blocks: [
+                {
+                  type: "text",
+                  props: {
+                    text: "Redes Sociais:\nFacebook | Instagram | LinkedIn",
+                    fontSize: 12,
+                    color: "#2563EB",
+                    align: "center",
+                  },
+                },
+              ],
             },
             {
               id: `footer-unsubscribe-${Date.now()}`,
-              blocks: [{
-                type: "text",
-                props: {
-                  text: "Cancelar inscrição\nEste email foi enviado para você porque se inscreveu em nossa lista.",
-                  fontSize: 11,
-                  color: "#94A3B8",
-                  align: "right"
-                }
-              }]
-            }
-          ]
-        }
-      }
-    ]
-  }
+              blocks: [
+                {
+                  type: "text",
+                  props: {
+                    text: "Cancelar inscrição\nEste email foi enviado para você porque se inscreveu em nossa lista.",
+                    fontSize: 11,
+                    color: "#94A3B8",
+                    align: "right",
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    ],
+  },
 ];
 
 function generateHtml(blocks: Block[]) {
@@ -299,7 +309,12 @@ function generateHtml(blocks: Block[]) {
         let widths: number[];
 
         if (count === 2) {
-          widths = layout === "70-30" ? [70, 30] : layout === "30-70" ? [30, 70] : [50, 50];
+          widths =
+            layout === "70-30"
+              ? [70, 30]
+              : layout === "30-70"
+                ? [30, 70]
+                : [50, 50];
         } else {
           widths = [33, 34, 33];
         }
@@ -545,16 +560,14 @@ export default function TemplateEdit() {
         props: {
           columnCount: count,
           layout: layout,
-          columns: cols
-            .slice(0, count)
-            .map((c: any) => ({
-              id:
-                c?.id ??
-                `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
-              blocks: Array.isArray(c?.blocks)
-                ? c.blocks.map((bb: any) => normalizeBlock(bb))
-                : [],
-            })),
+          columns: cols.slice(0, count).map((c: any) => ({
+            id:
+              c?.id ??
+              `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
+            blocks: Array.isArray(c?.blocks)
+              ? c.blocks.map((bb: any) => normalizeBlock(bb))
+              : [],
+          })),
         },
       } as Block;
     }
@@ -613,7 +626,7 @@ export default function TemplateEdit() {
       }
       setDropIndex(null);
     } else if (presetKey) {
-      const preset = PRESETS.find(p => p.key === presetKey);
+      const preset = PRESETS.find((p) => p.key === presetKey);
       if (preset) {
         const insertAt = dropIndex ?? blocks.length;
         setBlocks((prev) => {
@@ -819,7 +832,10 @@ export default function TemplateEdit() {
                     key={preset.key}
                     draggable
                     onDragStart={(e) => {
-                      e.dataTransfer.setData("application/x-preset", preset.key);
+                      e.dataTransfer.setData(
+                        "application/x-preset",
+                        preset.key,
+                      );
                       e.dataTransfer.effectAllowed = "copy";
                     }}
                     onClick={() => {
@@ -828,7 +844,9 @@ export default function TemplateEdit() {
                     className="flex cursor-grab items-center justify-between rounded border bg-secondary/20 px-3 py-2 text-sm hover:bg-secondary/40"
                   >
                     <span>{preset.label}</span>
-                    <span className="text-xs text-muted-foreground">arraste</span>
+                    <span className="text-xs text-muted-foreground">
+                      arraste
+                    </span>
                   </div>
                 ))}
               </div>
@@ -937,8 +955,21 @@ export default function TemplateEdit() {
                                 ),
                               )
                             }
-                            onStartResize={(handle, startX, startY, startW, startH) =>
-                              setResizing({ index: idx, handle, startX, startY, startW, startH })
+                            onStartResize={(
+                              handle,
+                              startX,
+                              startY,
+                              startW,
+                              startH,
+                            ) =>
+                              setResizing({
+                                index: idx,
+                                handle,
+                                startX,
+                                startY,
+                                startW,
+                                startH,
+                              })
                             }
                           />
                         </div>
@@ -1214,7 +1245,12 @@ function RenderBlock({
 
     let gridTemplate: string;
     if (count === 2) {
-      gridTemplate = layout === "70-30" ? "7fr 3fr" : layout === "30-70" ? "3fr 7fr" : "1fr 1fr";
+      gridTemplate =
+        layout === "70-30"
+          ? "7fr 3fr"
+          : layout === "30-70"
+            ? "3fr 7fr"
+            : "1fr 1fr";
     } else {
       gridTemplate = `repeat(${count}, minmax(0, 1fr))`;
     }
@@ -1270,7 +1306,8 @@ function RenderBlock({
     );
   }
   if (block.type === "box") {
-    const { backgroundColor, padding, margin, border, borderRadius } = block.props;
+    const { backgroundColor, padding, margin, border, borderRadius } =
+      block.props;
     return (
       <div
         className="w-full min-h-[60px] rounded border-2 border-dashed border-muted"
@@ -1291,7 +1328,9 @@ function RenderBlock({
           onDrop={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            const type = e.dataTransfer.getData("application/x-block-type") as Block["type"];
+            const type = e.dataTransfer.getData(
+              "application/x-block-type",
+            ) as Block["type"];
             if (type && onDropColZone) {
               onDropColZone(0, 0, e);
             }
@@ -1327,7 +1366,9 @@ function RenderBlock({
                 onDrop={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
-                  const type = e.dataTransfer.getData("application/x-block-type") as Block["type"];
+                  const type = e.dataTransfer.getData(
+                    "application/x-block-type",
+                  ) as Block["type"];
                   if (type && onDropColZone) {
                     onDropColZone(0, childIdx + 1, e);
                   }
@@ -1617,7 +1658,9 @@ function PropertiesEditor({
             <Input
               type="number"
               value={block.props.padding ?? 16}
-              onChange={(e) => onChange({ padding: Number(e.target.value || 0) })}
+              onChange={(e) =>
+                onChange({ padding: Number(e.target.value || 0) })
+              }
             />
           </div>
           <div className="space-y-1">
@@ -1625,7 +1668,9 @@ function PropertiesEditor({
             <Input
               type="number"
               value={block.props.margin ?? 0}
-              onChange={(e) => onChange({ margin: Number(e.target.value || 0) })}
+              onChange={(e) =>
+                onChange({ margin: Number(e.target.value || 0) })
+              }
             />
           </div>
         </div>
@@ -1643,7 +1688,9 @@ function PropertiesEditor({
           <Input
             type="number"
             value={block.props.borderRadius ?? 8}
-            onChange={(e) => onChange({ borderRadius: Number(e.target.value || 0) })}
+            onChange={(e) =>
+              onChange({ borderRadius: Number(e.target.value || 0) })
+            }
           />
         </div>
       </div>
