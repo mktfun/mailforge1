@@ -20,16 +20,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     async function getInitialSession() {
       try {
-        const { data } = await supabase.auth.getSession();
+        console.log("Checking for existing session...");
+        const { data, error } = await supabase.auth.getSession();
+
         if (!mounted) return;
-        setUser(data.session?.user ?? null);
+
+        if (error && (error.message.includes("Failed to fetch") || error.message.includes("network"))) {
+          throw new Error(error.message);
+        }
+
+        if (data.session) {
+          console.log("Found Supabase session:", data.session.user.email);
+          setUser(data.session.user);
+        } else {
+          console.log("No Supabase session found");
+          setUser(null);
+        }
         setLoading(false);
       } catch (error) {
         console.warn("Supabase session failed, checking fallback auth:", error);
-        // Check fallback auth
-        const { data } = await mockAuth.getSession();
-        if (!mounted) return;
-        setUser(data.session?.user ?? null);
+        try {
+          const { data } = await mockAuth.getSession();
+          if (!mounted) return;
+
+          if (data.session) {
+            console.log("Found fallback session:", data.session.user.email);
+            setUser(data.session.user);
+          } else {
+            console.log("No fallback session found");
+            setUser(null);
+          }
+        } catch (fallbackError) {
+          console.error("Fallback session check failed:", fallbackError);
+          if (!mounted) return;
+          setUser(null);
+        }
         setLoading(false);
       }
     }
