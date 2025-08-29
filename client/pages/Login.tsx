@@ -31,25 +31,40 @@ export default function Login() {
     try {
       console.log("Attempting login with:", email);
       let result;
+      let usingFallback = false;
 
       // Try Supabase first
       try {
+        console.log("Trying Supabase authentication...");
         result = await supabase.auth.signInWithPassword({
           email,
           password,
         });
         console.log("Supabase login response:", result);
+
+        // Check if Supabase returned an error but didn't throw
+        if (result.error && (result.error.message.includes("Failed to fetch") || result.error.message.includes("network"))) {
+          throw new Error(result.error.message);
+        }
       } catch (supabaseError) {
         console.warn("Supabase failed, using fallback auth:", supabaseError);
-        // Use fallback auth if Supabase fails
-        result = await mockAuth.signInWithPassword({
-          email,
-          password,
-        });
-        console.log("Fallback login response:", result);
+        usingFallback = true;
+
+        try {
+          // Use fallback auth if Supabase fails
+          result = await mockAuth.signInWithPassword({
+            email,
+            password,
+          });
+          console.log("Fallback login response:", result);
+        } catch (fallbackError) {
+          console.error("Fallback auth also failed:", fallbackError);
+          throw fallbackError;
+        }
       }
 
       setLoading(false);
+
       if (result.error) {
         console.error("Login error:", result.error);
         setError(`Erro de login: ${result.error.message}`);
@@ -58,13 +73,26 @@ export default function Login() {
 
       if (result.data.user) {
         console.log("Login successful, redirecting...");
+
+        // Show a brief message if using fallback
+        if (usingFallback) {
+          setError("Login realizado em modo offline (extensão do navegador interferindo na conexão)");
+          setTimeout(() => setError(null), 3000);
+        }
+
         const redirectTo = location.state?.from || "/dashboard";
         navigate(redirectTo);
       }
     } catch (err) {
       console.error("Login catch error:", err);
       setLoading(false);
-      setError(`Erro de conexão: ${err instanceof Error ? err.message : "Falha na conexão com o servidor"}`);
+
+      const errorMessage = err instanceof Error ? err.message : "Erro desconhecido";
+      if (errorMessage.includes("chrome-extension") || errorMessage.includes("Failed to fetch")) {
+        setError("Erro de rede detectado - possivelmente causado por extensão do navegador. Tente desabilitar extensões ou usar modo incógnito.");
+      } else {
+        setError(`Erro de conexão: ${errorMessage}`);
+      }
     }
   }
 
