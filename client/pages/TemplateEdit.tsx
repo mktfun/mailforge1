@@ -467,6 +467,8 @@ export default function TemplateEdit() {
     const type = e.dataTransfer.getData(
       "application/x-block-type",
     ) as Block["type"];
+    const presetKey = e.dataTransfer.getData("application/x-preset");
+
     if (type) {
       const insertAt = dropIndex ?? blocks.length;
       setBlocks((prev) => {
@@ -478,6 +480,17 @@ export default function TemplateEdit() {
         setSelected(insertAt);
       }
       setDropIndex(null);
+    } else if (presetKey) {
+      const preset = PRESETS.find(p => p.key === presetKey);
+      if (preset) {
+        const insertAt = dropIndex ?? blocks.length;
+        setBlocks((prev) => {
+          const arr = [...prev];
+          arr.splice(insertAt, 0, ...preset.blocks);
+          return arr;
+        });
+        setDropIndex(null);
+      }
     }
   }
 
