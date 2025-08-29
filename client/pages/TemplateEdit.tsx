@@ -640,7 +640,7 @@ export default function TemplateEdit() {
             <CardTitle className="text-base">Ferramentas</CardTitle>
             <CardDescription>Arraste para o canvas</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="space-y-4">
             <div className="grid gap-2">
               {PALETTE.map((p) => (
                 <div
@@ -654,6 +654,29 @@ export default function TemplateEdit() {
                   <span className="text-xs text-muted-foreground">arraste</span>
                 </div>
               ))}
+            </div>
+
+            <div className="border-t pt-4">
+              <h4 className="text-sm font-medium mb-2">Layouts Prontos</h4>
+              <div className="grid gap-2">
+                {PRESETS.map((preset) => (
+                  <div
+                    key={preset.key}
+                    draggable
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData("application/x-preset", preset.key);
+                      e.dataTransfer.effectAllowed = "copy";
+                    }}
+                    onClick={() => {
+                      setBlocks((prev) => [...prev, ...preset.blocks]);
+                    }}
+                    className="flex cursor-grab items-center justify-between rounded border bg-secondary/20 px-3 py-2 text-sm hover:bg-secondary/40"
+                  >
+                    <span>{preset.label}</span>
+                    <span className="text-xs text-muted-foreground">arraste</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </CardContent>
         </Card>
