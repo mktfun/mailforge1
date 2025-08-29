@@ -562,14 +562,24 @@ export default function TemplateEdit() {
     setBlocks((prev) => {
       const arr = [...prev];
       const parentBlk = arr[parent];
-      if (!parentBlk || parentBlk.type !== "columns") return prev;
-      const col = parentBlk.props.columns[colIndex];
+      if (!parentBlk) return prev;
+
+      let targetBlocks: Block[];
+      if (parentBlk.type === "columns") {
+        const col = parentBlk.props.columns[colIndex];
+        targetBlocks = col.blocks;
+      } else if (parentBlk.type === "box") {
+        targetBlocks = parentBlk.props.blocks;
+      } else {
+        return prev;
+      }
+
       if (from && from.parent === parent && from.colIndex === colIndex) {
-        const [item] = col.blocks.splice(from.index, 1);
+        const [item] = targetBlocks.splice(from.index, 1);
         const insertAt = from.index < index ? index - 1 : index;
-        col.blocks.splice(insertAt, 0, item);
+        targetBlocks.splice(insertAt, 0, item);
       } else if (type) {
-        col.blocks.splice(index, 0, defaultBlock(type));
+        targetBlocks.splice(index, 0, defaultBlock(type));
       }
       return arr;
     });
