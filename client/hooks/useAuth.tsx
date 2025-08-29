@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase, mockAuth } from "@/lib/supabaseClient";
 
 export type AuthContextValue = {
   user: import("@supabase/supabase-js").User | null;
@@ -17,14 +17,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     let mounted = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (!mounted) return;
-      setUser(data.session?.user ?? null);
-      setLoading(false);
-    });
+
+    async function getInitialSession() {
+      try {
+        const { data } = await supabase.auth.getSession();
+        if (!mounted) return;
+        setUser(data.session?.user ?? null);
+        setLoading(false);
+      } catch (error) {
+        console.warn("Supabase session failed, checking fallback auth:", error);
+        // Check fallback auth
+        const { data } = await mockAuth.getSession();
+        if (!mounted) return;
+        setUser(data.session?.user ?? null);
+        setLoading(false);
+      }
+    }
+
+    getInitialSession();
+
+    // Set up auth state change listener
     const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
     });
+
     return () => {
       mounted = false;
       sub.subscription.unsubscribe();
@@ -32,7 +48,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo<AuthContextValue>(
-    () => ({ user, loading, signOut: () => supabase.auth.signOut() }),
+    () => ({
+      user,
+      loading,
+      signOut: async () => {
+        try {
+          await supabase.auth.signOut();
+        } catch (error) {
+          console.warn("Supabase signOut failed, using fallback:", error);
+          await mockAuth.signOut();
+        }
+        setUser(null);
+      }
+    }),
     [user, loading],
   );
 
