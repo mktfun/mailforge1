@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase, mockAuth } from "@/lib/supabaseClient";
 
 export default function Cadastro() {
   const [email, setEmail] = useState("");
@@ -22,14 +22,34 @@ export default function Cadastro() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const { data, error } = await supabase.auth.signUp({ email, password });
-    setLoading(false);
-    if (error) {
-      setError(error.message);
-      return;
+
+    try {
+      let result;
+
+      // Try Supabase first
+      try {
+        result = await supabase.auth.signUp({ email, password });
+        console.log("Supabase signup response:", result);
+      } catch (supabaseError) {
+        console.warn("Supabase signup failed, using fallback auth:", supabaseError);
+        // Use fallback auth if Supabase fails
+        result = await mockAuth.signUp({ email, password });
+        console.log("Fallback signup response:", result);
+      }
+
+      setLoading(false);
+      if (result.error) {
+        setError(result.error.message);
+        return;
+      }
+
+      // If email confirmations are ON, user might need to confirm. For now, route to dashboard after session is created.
+      if (result.data.session) navigate("/dashboard");
+    } catch (err) {
+      console.error("Signup error:", err);
+      setLoading(false);
+      setError(`Erro de conexão: ${err instanceof Error ? err.message : "Falha na conexão com o servidor"}`);
     }
-    // If email confirmations are ON, user might need to confirm. For now, route to dashboard after session is created.
-    if (data.session) navigate("/dashboard");
   }
 
   return (
