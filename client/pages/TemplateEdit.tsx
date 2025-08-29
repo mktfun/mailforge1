@@ -51,7 +51,26 @@ export type Block =
   | { type: "divider"; props: { color?: string } }
   | {
       type: "columns";
-      props: { columnCount: 2 | 3; columns: { id: string; blocks: Block[] }[] };
+      props: {
+        columnCount: 2 | 3;
+        layout?: "equal" | "70-30" | "30-70";
+        columns: { id: string; blocks: Block[] }[]
+      };
+    }
+  | {
+      type: "box";
+      props: {
+        backgroundColor?: string;
+        padding?: number;
+        margin?: number;
+        border?: string;
+        borderRadius?: number;
+        blocks: Block[];
+      };
+    }
+  | {
+      type: "spacer";
+      props: { height: number };
     };
 
 type Template = {
