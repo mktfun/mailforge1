@@ -3,20 +3,51 @@ import { createClient } from "@supabase/supabase-js";
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string || "https://jptqwesfjiokzmginteo.supabase.co";
 const supabaseAnon = import.meta.env.VITE_SUPABASE_ANON_KEY as string || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpwdHF3ZXNmamloa3ptZ2ludGVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0Njk2MzYsImV4cCI6MjA3MjA0NTYzNn0.dTjSOFb3jwAP5V0jl8RA_QfUNEd7oMNZKDDpbIIafdA";
 
-// Supabase configuration loaded
+console.log("Supabase URL:", supabaseUrl);
+console.log("Supabase Anon Key available:", !!supabaseAnon);
 
 if (!supabaseUrl || !supabaseAnon) {
-  // Intentionally throw to surface misconfiguration early in dev
+  console.error("Missing Supabase configuration");
   throw new Error(
     "Missing Supabase environment variables. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY.",
   );
 }
 
+// Create custom fetch with better error handling for browser extension interference
+const customFetch = async (url: RequestInfo | URL, options?: RequestInit) => {
+  try {
+    const response = await fetch(url, {
+      ...options,
+      mode: 'cors',
+      credentials: 'include',
+    });
+    return response;
+  } catch (error) {
+    console.error("Network fetch error (possibly browser extension interference):", error);
+    throw new Error("Failed to fetch - browser extension or network issue");
+  }
+};
+
 export const supabase = createClient(supabaseUrl, supabaseAnon, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true
+    detectSessionInUrl: true,
+    flowType: 'pkce'
+  },
+  global: {
+    fetch: customFetch,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  },
+  db: {
+    schema: 'public',
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10,
+    },
   },
 });
 
