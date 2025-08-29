@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/card";
 import { supabase } from "@/lib/supabaseClient";
 import { useAuth } from "@/hooks/useAuth";
+import SupabaseTest from "@/components/SupabaseTest";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -58,7 +59,8 @@ export default function Login() {
 
   return (
     <main className="min-h-screen bg-muted py-10">
-      <div className="container max-w-md">
+      <div className="container max-w-md space-y-4">
+        <SupabaseTest />
         <Card>
           <CardHeader>
             <CardTitle>Entrar</CardTitle>
