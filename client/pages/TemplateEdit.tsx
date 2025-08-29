@@ -1127,6 +1127,92 @@ function RenderBlock({
       </div>
     );
   }
+  if (block.type === "box") {
+    const { backgroundColor, padding, margin, border, borderRadius } = block.props;
+    return (
+      <div
+        className="w-full min-h-[60px] rounded border-2 border-dashed border-muted"
+        style={{
+          backgroundColor: backgroundColor || "transparent",
+          padding: `${padding || 16}px`,
+          margin: `${margin || 0}px 0`,
+          border: border || "1px solid #E2E8F0",
+          borderRadius: `${borderRadius || 8}px`,
+        }}
+      >
+        <DropZone
+          active={false}
+          onDragOver={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+          }}
+          onDrop={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            const type = e.dataTransfer.getData("application/x-block-type") as Block["type"];
+            if (type && onDropColZone) {
+              onDropColZone(0, 0, e);
+            }
+          }}
+        />
+        <div className="space-y-2">
+          {block.props.blocks.map((child, childIdx) => (
+            <div key={childIdx}>
+              <div
+                draggable
+                onDragStart={() => onStartColDrag?.(0, childIdx)}
+                className="relative rounded border p-2 hover:border-muted"
+              >
+                <RenderBlock
+                  block={child as any}
+                  selected={false}
+                  editing={false}
+                  onStartEdit={() => {}}
+                  onEndEdit={() => {}}
+                  onChangeText={() => {}}
+                  onStartResize={() => {}}
+                  onStartColDrag={onStartColDrag}
+                  onDropColZone={onDropColZone}
+                  onDragOverColZone={onDragOverColZone}
+                />
+              </div>
+              <DropZone
+                active={false}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const type = e.dataTransfer.getData("application/x-block-type") as Block["type"];
+                  if (type && onDropColZone) {
+                    onDropColZone(0, childIdx + 1, e);
+                  }
+                }}
+              />
+            </div>
+          ))}
+        </div>
+        {block.props.blocks.length === 0 && (
+          <div className="text-center text-muted-foreground text-sm py-4">
+            Arraste componentes aqui
+          </div>
+        )}
+      </div>
+    );
+  }
+  if (block.type === "spacer") {
+    const height = block.props.height || 32;
+    return (
+      <div
+        className="w-full bg-muted/20 border border-dashed border-muted rounded flex items-center justify-center text-xs text-muted-foreground"
+        style={{ height: `${height}px` }}
+      >
+        Espaçador ({height}px)
+      </div>
+    );
+  }
   return null;
 }
 
