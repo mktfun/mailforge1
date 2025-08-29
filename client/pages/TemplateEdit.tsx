@@ -1404,5 +1404,122 @@ function PropertiesEditor({
       </div>
     );
   }
+  if (block.type === "columns") {
+    return (
+      <div className="space-y-3">
+        <div className="space-y-1">
+          <label className="text-sm font-medium">Tipo de Coluna</label>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              variant={block.props.columnCount === 2 ? "default" : "outline"}
+              size="sm"
+              onClick={() => onChange({ columnCount: 2 })}
+            >
+              2 Colunas
+            </Button>
+            <Button
+              variant={block.props.columnCount === 3 ? "default" : "outline"}
+              size="sm"
+              onClick={() => onChange({ columnCount: 3 })}
+            >
+              3 Colunas
+            </Button>
+          </div>
+        </div>
+        {block.props.columnCount === 2 && (
+          <div className="space-y-1">
+            <label className="text-sm font-medium">Layout</label>
+            <div className="grid gap-2">
+              <Button
+                variant={block.props.layout === "equal" ? "default" : "outline"}
+                size="sm"
+                onClick={() => onChange({ layout: "equal" })}
+              >
+                Igual (50/50)
+              </Button>
+              <Button
+                variant={block.props.layout === "70-30" ? "default" : "outline"}
+                size="sm"
+                onClick={() => onChange({ layout: "70-30" })}
+              >
+                Esquerda Maior (70/30)
+              </Button>
+              <Button
+                variant={block.props.layout === "30-70" ? "default" : "outline"}
+                size="sm"
+                onClick={() => onChange({ layout: "30-70" })}
+              >
+                Direita Maior (30/70)
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+  if (block.type === "box") {
+    return (
+      <div className="space-y-3">
+        <div className="space-y-1">
+          <label className="text-sm font-medium">Cor de Fundo</label>
+          <Input
+            type="text"
+            value={block.props.backgroundColor ?? "transparent"}
+            onChange={(e) => onChange({ backgroundColor: e.target.value })}
+            placeholder="transparent"
+          />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1">
+            <label className="text-sm font-medium">Padding (px)</label>
+            <Input
+              type="number"
+              value={block.props.padding ?? 16}
+              onChange={(e) => onChange({ padding: Number(e.target.value || 0) })}
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-sm font-medium">Margin (px)</label>
+            <Input
+              type="number"
+              value={block.props.margin ?? 0}
+              onChange={(e) => onChange({ margin: Number(e.target.value || 0) })}
+            />
+          </div>
+        </div>
+        <div className="space-y-1">
+          <label className="text-sm font-medium">Borda</label>
+          <Input
+            type="text"
+            value={block.props.border ?? "1px solid #E2E8F0"}
+            onChange={(e) => onChange({ border: e.target.value })}
+            placeholder="1px solid #E2E8F0"
+          />
+        </div>
+        <div className="space-y-1">
+          <label className="text-sm font-medium">Borda Arredondada (px)</label>
+          <Input
+            type="number"
+            value={block.props.borderRadius ?? 8}
+            onChange={(e) => onChange({ borderRadius: Number(e.target.value || 0) })}
+          />
+        </div>
+      </div>
+    );
+  }
+  if (block.type === "spacer") {
+    return (
+      <div className="space-y-3">
+        <div className="space-y-1">
+          <label className="text-sm font-medium">Altura (px)</label>
+          <Input
+            type="number"
+            value={block.props.height ?? 32}
+            onChange={(e) => onChange({ height: Number(e.target.value || 32) })}
+          />
+        </div>
+      </div>
+    );
+  }
   return null;
 }
