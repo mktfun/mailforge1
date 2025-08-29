@@ -9,7 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase, mockAuth } from "@/lib/supabaseClient";
 import { useAuth } from "@/hooks/useAuth";
 import SupabaseTest from "@/components/SupabaseTest";
 
@@ -31,21 +31,33 @@ export default function Login() {
 
     try {
       console.log("Attempting login with:", email);
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      let result;
 
-      console.log("Login response:", { data, error });
+      // Try Supabase first
+      try {
+        result = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        console.log("Supabase login response:", result);
+      } catch (supabaseError) {
+        console.warn("Supabase failed, using fallback auth:", supabaseError);
+        // Use fallback auth if Supabase fails
+        result = await mockAuth.signInWithPassword({
+          email,
+          password,
+        });
+        console.log("Fallback login response:", result);
+      }
 
       setLoading(false);
-      if (error) {
-        console.error("Login error:", error);
-        setError(`Erro de login: ${error.message}`);
+      if (result.error) {
+        console.error("Login error:", result.error);
+        setError(`Erro de login: ${result.error.message}`);
         return;
       }
 
-      if (data.user) {
+      if (result.data.user) {
         console.log("Login successful, redirecting...");
         const redirectTo = location.state?.from || "/dashboard";
         navigate(redirectTo);
