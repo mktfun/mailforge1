@@ -929,10 +929,10 @@ export default function TemplateEdit() {
                               setBlocks((prev) =>
                                 prev.map((bb, i) =>
                                   i === idx && b.type === "text"
-                                    ? {
+                                    ? ({
                                         ...bb,
                                         props: { ...bb.props, text: val },
-                                      }
+                                      } as Block)
                                     : bb,
                                 ),
                               )
