@@ -937,8 +937,8 @@ export default function TemplateEdit() {
                                 ),
                               )
                             }
-                            onStartResize={(startX, startW) =>
-                              setResizing({ index: idx, startX, startW })
+                            onStartResize={(handle, startX, startY, startW, startH) =>
+                              setResizing({ index: idx, handle, startX, startY, startW, startH })
                             }
                           />
                         </div>
