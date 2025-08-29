@@ -27,17 +27,33 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     setError(null);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    setLoading(false);
-    if (error) {
-      setError(error.message);
-      return;
+
+    try {
+      console.log("Attempting login with:", email);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      console.log("Login response:", { data, error });
+
+      setLoading(false);
+      if (error) {
+        console.error("Login error:", error);
+        setError(`Erro de login: ${error.message}`);
+        return;
+      }
+
+      if (data.user) {
+        console.log("Login successful, redirecting...");
+        const redirectTo = location.state?.from || "/dashboard";
+        navigate(redirectTo);
+      }
+    } catch (err) {
+      console.error("Login catch error:", err);
+      setLoading(false);
+      setError(`Erro de conexão: ${err instanceof Error ? err.message : "Falha na conexão com o servidor"}`);
     }
-    const redirectTo = location.state?.from || "/dashboard";
-    navigate(redirectTo);
   }
 
   return (
