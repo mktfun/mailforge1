@@ -24,31 +24,63 @@ export default function Cadastro() {
     setError(null);
 
     try {
+      console.log("Attempting signup with:", email);
       let result;
+      let usingFallback = false;
 
       // Try Supabase first
       try {
+        console.log("Trying Supabase signup...");
         result = await supabase.auth.signUp({ email, password });
         console.log("Supabase signup response:", result);
+
+        // Check if Supabase returned an error but didn't throw
+        if (result.error && (result.error.message.includes("Failed to fetch") || result.error.message.includes("network"))) {
+          throw new Error(result.error.message);
+        }
       } catch (supabaseError) {
         console.warn("Supabase signup failed, using fallback auth:", supabaseError);
-        // Use fallback auth if Supabase fails
-        result = await mockAuth.signUp({ email, password });
-        console.log("Fallback signup response:", result);
+        usingFallback = true;
+
+        try {
+          // Use fallback auth if Supabase fails
+          result = await mockAuth.signUp({ email, password });
+          console.log("Fallback signup response:", result);
+        } catch (fallbackError) {
+          console.error("Fallback signup also failed:", fallbackError);
+          throw fallbackError;
+        }
       }
 
       setLoading(false);
+
       if (result.error) {
-        setError(result.error.message);
+        console.error("Signup error:", result.error);
+        setError(`Erro de cadastro: ${result.error.message}`);
         return;
       }
 
-      // If email confirmations are ON, user might need to confirm. For now, route to dashboard after session is created.
-      if (result.data.session) navigate("/dashboard");
+      if (result.data.user || result.data.session) {
+        console.log("Signup successful, redirecting...");
+
+        // Show a brief message if using fallback
+        if (usingFallback) {
+          setError("Cadastro realizado em modo offline (extensão do navegador interferindo na conexão)");
+          setTimeout(() => setError(null), 3000);
+        }
+
+        navigate("/dashboard");
+      }
     } catch (err) {
-      console.error("Signup error:", err);
+      console.error("Signup catch error:", err);
       setLoading(false);
-      setError(`Erro de conexão: ${err instanceof Error ? err.message : "Falha na conexão com o servidor"}`);
+
+      const errorMessage = err instanceof Error ? err.message : "Erro desconhecido";
+      if (errorMessage.includes("chrome-extension") || errorMessage.includes("Failed to fetch")) {
+        setError("Erro de rede detectado - possivelmente causado por extensão do navegador. Tente desabilitar extensões ou usar modo incógnito.");
+      } else {
+        setError(`Erro de conexão: ${errorMessage}`);
+      }
     }
   }
 
