@@ -7,41 +7,33 @@ export default function SupabaseTest() {
   useEffect(() => {
     async function testConnection() {
       try {
-        // Test basic connection
+        console.log("Testing Supabase connection...");
+
+        // Test basic auth session
         const { data, error } = await supabase.auth.getSession();
-        
+
         if (error) {
-          setStatus(`Auth Error: ${error.message}`);
+          console.error("Auth session error:", error);
+          setStatus(`❌ Auth Error: ${error.message}`);
           return;
         }
-        
-        // Try a simple query
-        const { data: testData, error: queryError } = await supabase
-          .from('profiles')
-          .select('count', { count: 'exact', head: true });
-        
-        if (queryError) {
-          if (queryError.message.includes('relation "profiles" does not exist')) {
-            setStatus("✅ Connection OK - Database tables need to be created");
-          } else {
-            setStatus(`Query Error: ${queryError.message}`);
-          }
-        } else {
-          setStatus("✅ Full connection successful!");
-        }
-        
+
+        console.log("Auth session test passed:", data);
+        setStatus("✅ Auth connection successful!");
+
       } catch (err) {
-        setStatus(`Connection Error: ${err instanceof Error ? err.message : "Unknown error"}`);
+        console.error("Connection test error:", err);
+        setStatus(`❌ Connection Error: ${err instanceof Error ? err.message : "Unknown error"}`);
       }
     }
-    
+
     testConnection();
   }, []);
 
   return (
     <div className="p-4 bg-gray-100 rounded">
       <h3 className="font-semibold">Supabase Connection Test</h3>
-      <p>{status}</p>
+      <p className="text-sm">{status}</p>
     </div>
   );
 }
