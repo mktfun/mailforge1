@@ -140,6 +140,99 @@ function defaultBlock(t: Block["type"]): Block {
   }
 }
 
+const PRESETS: { key: string; label: string; blocks: Block[] }[] = [
+  {
+    key: "header",
+    label: "Cabeçalho",
+    blocks: [
+      {
+        type: "columns",
+        props: {
+          columnCount: 2,
+          layout: "30-70",
+          columns: [
+            {
+              id: `header-logo-${Date.now()}`,
+              blocks: [{
+                type: "image",
+                props: {
+                  src: "https://placehold.co/120x60?text=LOGO",
+                  alt: "Logo",
+                  width: 120,
+                  height: 60
+                }
+              }]
+            },
+            {
+              id: `header-menu-${Date.now()}`,
+              blocks: [{
+                type: "text",
+                props: {
+                  text: "Home | Sobre | Contato | Blog",
+                  fontSize: 16,
+                  color: "#2563EB",
+                  align: "right"
+                }
+              }]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  {
+    key: "footer",
+    label: "Rodapé",
+    blocks: [
+      {
+        type: "columns",
+        props: {
+          columnCount: 3,
+          layout: "equal",
+          columns: [
+            {
+              id: `footer-contact-${Date.now()}`,
+              blocks: [{
+                type: "text",
+                props: {
+                  text: "Contato:\nEmail: contato@empresa.com\nTelefone: (11) 99999-9999",
+                  fontSize: 12,
+                  color: "#64748B",
+                  align: "left"
+                }
+              }]
+            },
+            {
+              id: `footer-social-${Date.now()}`,
+              blocks: [{
+                type: "text",
+                props: {
+                  text: "Redes Sociais:\nFacebook | Instagram | LinkedIn",
+                  fontSize: 12,
+                  color: "#2563EB",
+                  align: "center"
+                }
+              }]
+            },
+            {
+              id: `footer-unsubscribe-${Date.now()}`,
+              blocks: [{
+                type: "text",
+                props: {
+                  text: "Cancelar inscrição\nEste email foi enviado para você porque se inscreveu em nossa lista.",
+                  fontSize: 11,
+                  color: "#94A3B8",
+                  align: "right"
+                }
+              }]
+            }
+          ]
+        }
+      }
+    ]
+  }
+];
+
 function generateHtml(blocks: Block[]) {
   const parts: string[] = [];
   parts.push(
